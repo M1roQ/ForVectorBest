@@ -6,6 +6,8 @@ import numpy as np
 
 
 if __name__ == "__main__":
+    n_range = 5
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-p", "--path", help="Dirpath for visualisation")
@@ -16,7 +18,7 @@ if __name__ == "__main__":
     with open(f"{path}/results.json", "r", encoding="utf-8") as json_file:
         data = json.load(json_file)
     
-    canvas = plt.subplots(
+    _, canvas = plt.subplots(
         nrows=len(data[list(data.keys())[0]].keys()), 
         ncols=len(data.keys()),
         figsize=(25, 12)
@@ -26,12 +28,12 @@ if __name__ == "__main__":
         for j, metric in enumerate(data[group].keys()):
             values = data[group][metric]
 
-            canvas[1][i][j].set_xticks(np.arange(0, len(values) + 1, 10))
-            canvas[1][i][j].grid(axis='x', linestyle='-', linewidth=2, color='gray')
-            canvas[1][i][j].grid(axis='y', linestyle='--', alpha=0.5)
+            canvas[i][j].set_xticks(np.arange(0, len(values) + 1, n_range))
+            canvas[i][j].grid(axis='x', linestyle='-', linewidth=2, color='gray')
+            canvas[i][j].grid(axis='y', linestyle='--', alpha=0.5)
 
-            canvas[1][i][j].plot(list(range(len(values))), values, "g-o")
-            canvas[1][i][j].set_title(f"{group}/{metric}")
+            canvas[i][j].plot(list(range(len(values))), values, "g-o")
+            canvas[i][j].set_title(f"{group}/{metric}")
     
     plt.savefig(f"{path}/results.png", format="png", dpi=600)
     # plt.show()

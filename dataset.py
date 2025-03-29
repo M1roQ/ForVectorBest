@@ -4,10 +4,36 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
+from tqdm import tqdm
 
 
-class StickersDataset(Dataset):
-    def __init__(self, root_dir, classes=["Good", "Bad"], transform=None):
+class DatasetParams:
+    train_path = "dataset/train"
+    valid_path = "dataset/valid"
+    classes = ["good", "bad"]
+    batch_size = 64
+    num_workers = 8
+    mean = [0.4623, 0.4075, 0.3524]
+    std = [0.2131, 0.1922, 0.2214]
+    
+    data_transforms = {
+        "train": transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std)
+        ]),
+        "valid": transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std)
+        ]),
+    }
+
+
+class CustomDataset(Dataset):
+    def __init__(self, root_dir, classes, transform=None):
         self.root_dir = root_dir
         self.transform = transform
         self.classes = classes
@@ -15,6 +41,7 @@ class StickersDataset(Dataset):
         self.images = []
         self.labels = []
 
+        # filling pathes to images and labels
         for i, image_class in enumerate(classes):
             class_path = os.path.join(root_dir, image_class)
             for image_name in os.listdir(class_path):
@@ -35,7 +62,7 @@ class StickersDataset(Dataset):
         return image_obj, label
 
 
-def calculate_mean_std(dataset, batch_size=6, num_workers=4):
+def calculate_mean_std(dataset, batch_size, num_workers):
     dataloader = DataLoader(dataset, batch_size=batch_size,
                             shuffle=False, num_workers=num_workers)
 
@@ -43,12 +70,15 @@ def calculate_mean_std(dataset, batch_size=6, num_workers=4):
     std = torch.zeros(3)
     total_samples = 0
 
-    for images in dataloader:
-        batch_size = images[0].size(0)
-        images = images[0].view(batch_size, images[0].size(1), -1)
-        mean += images.mean(2).sum(0)
-        std += images.std(2).sum(0)
-        total_samples += batch_size
+    with tqdm(dataloader, desc="Calculating progress") as pbar:
+        for images in pbar:
+            batch_size = images[0].size(0)
+            images = images[0].view(batch_size, images[0].size(1), -1)
+            mean += images.mean(2).sum(0)
+            std += images.std(2).sum(0)
+            total_samples += batch_size
+            
+            pbar.set_postfix({"samples": total_samples})
 
     mean /= total_samples
     std /= total_samples
@@ -57,30 +87,15 @@ def calculate_mean_std(dataset, batch_size=6, num_workers=4):
 
 
 def get_mean_std():
-    valid = StickersDataset("stickers/valid")
-    test = StickersDataset("stickers/test")
-    full = StickersDataset("stickers/train", transform=transforms.Compose([transforms.Resize([256, 256]), transforms.ToTensor()]))
-    full.images += test.images + valid.images
-    full.labels += test.labels + valid.labels
-    print(calculate_mean_std(full))
+    valid = CustomDataset(DatasetParams.valid_path,
+                          classes=DatasetParams.classes)
+    full = CustomDataset(DatasetParams.train_path,
+                         classes=DatasetParams.classes,
+                         transform=transforms.Compose([transforms.Resize([256, 256]),
+                                                       transforms.ToTensor()]))
+    full.images += valid.images
+    full.labels += valid.labels
+    return calculate_mean_std(dataset=full,
+                              batch_size=DatasetParams.batch_size,
+                              num_workers=DatasetParams.num_workers)
 
-
-class DatasetParams:
-    classes = ["Good", "Bad"]
-    mean = [0.6755, 0.6786, 0.6398]
-    std = [0.1850, 0.1585, 0.1613]
-    
-    data_transforms = {
-        "train": transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(mean, std)
-        ]),
-        "valid": transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(mean, std)
-        ]),
-    }
