@@ -1,5 +1,5 @@
-# STICKERS > 2025-04-30 10:22am
-https://universe.roboflow.com/horseshoe/stickers-q9fwk
+# Stickers_OD > 2025-05-10 1:29pm
+https://universe.roboflow.com/project-bbmps/stickers_od
 
 Provided by a Roboflow user
 License: CC BY 4.0

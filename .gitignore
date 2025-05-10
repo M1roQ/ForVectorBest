@@ -4,3 +4,5 @@ work/
 __pycache__/
 runs/
 yolov8n.pt
+result/
+for_mask/

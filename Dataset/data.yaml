@@ -6,8 +6,8 @@ nc: 2
 names: ['something', 'text']
 
 roboflow:
-  workspace: horseshoe
-  project: stickers-q9fwk
-  version: 2
+  workspace: project-bbmps
+  project: stickers_od
+  version: 1
   license: CC BY 4.0
-  url: https://universe.roboflow.com/horseshoe/stickers-q9fwk/dataset/2
+  url: https://universe.roboflow.com/project-bbmps/stickers_od/dataset/1

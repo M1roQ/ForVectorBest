@@ -1,8 +1,8 @@
 
-STICKERS - v2 2025-04-30 10:22am
+Stickers_OD - v1 2025-05-10 1:29pm
 ==============================
 
-This dataset was exported via roboflow.com on April 30, 2025 at 3:23 AM GMT
+This dataset was exported via roboflow.com on May 10, 2025 at 6:30 AM GMT
 
 Roboflow is an end-to-end computer vision platform that helps you
 * collaborate with your team on computer vision projects
@@ -17,8 +17,8 @@ visit https://github.com/roboflow/notebooks
 
 To find over 100k other datasets and pre-trained models, visit https://universe.roboflow.com
 
-The dataset includes 35 images.
-Stickers are annotated in YOLOv8 format.
+The dataset includes 83 images.
+Text are annotated in YOLOv8 format.
 
 The following pre-processing was applied to each image:
 
